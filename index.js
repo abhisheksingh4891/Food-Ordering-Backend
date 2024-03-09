@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const FoodItemModel = require('./Model/Food_Items');
+const UserModel = require('./Model/User');
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,31 @@ mongoose.connect(MONGODB_URL)
       console.error('Error fetching data:', error);
       res.status(500).json({ error: 'Internal Server Error' });
     }
+  });
+
+  
+  app.post('/login', (req, res)=>{
+    const {email, password} =  req.body;
+    UserModel.findOne({email:email})
+    .then(user => {
+      if(user){
+        if(user.password === password){
+          res.json("Login Succesfull...")
+        }
+        else{
+          res.json("Password is incorrect...")
+        }
+      }
+      else{
+        res.json("User not found...")
+      }
+    })
+  })
+
+  app.post('/register', cors(), (req, res)=>{
+    UserModel.create(req.body)
+    .then(user => res.json(user))
+    .catch(err=> res.json(err))
   });
   
 
