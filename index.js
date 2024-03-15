@@ -79,6 +79,34 @@ mongoose.connect(MONGODB_URL)
     .catch(err=> res.json(err))
   });
 
+  app.get('/profile', async (req, res) => {
+    // Check if user is authenticated (you can implement this logic based on your session handling)
+    if (!req.session.userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+  
+    try {
+      // Retrieve user data based on user ID from the session
+      const user = await UserModel.findById(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Return user data excluding sensitive information like password
+      const userData = {
+        first: user.first,
+        last: user.last,
+        email: user.email,
+        // Add more fields as needed
+      };
+      res.json(userData);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+  
+
 const PORT = 5000; 
 app.listen(PORT, () => {
   console.log(`App is running on port: ${PORT}`);

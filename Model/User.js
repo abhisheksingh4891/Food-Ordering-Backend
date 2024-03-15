@@ -24,11 +24,7 @@ const UserSchema = new mongoose.Schema({
     confirmPassword: {
         type: String,
         required: true
-    },
-    orders: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Order'
-    }]
+    }
 });
 
 const userModel = mongoose.model('user', UserSchema);
