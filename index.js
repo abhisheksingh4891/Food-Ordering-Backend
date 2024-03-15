@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const FoodItemModel = require('./Model/Food_Items');
 const UserModel = require('./Model/User');
+const MerchantModel = require('./Model/Merchant')
 
 const app = express();
 app.use(cors());
@@ -56,7 +57,7 @@ mongoose.connect(MONGODB_URL)
   
   app.post('/loginmerchant', (req, res)=>{
     const {email, password} =  req.body;
-    UserModel.findOne({email:email})
+    MerchantModel.findOne({email:email})
     .then(user => {
       if(user){
         if(user.password === password){
@@ -73,7 +74,7 @@ mongoose.connect(MONGODB_URL)
   })
 
   app.post('/registermerchant', cors(), (req, res)=>{
-    UserModel.create(req.body)
+    MerchantModel.create(req.body)
     .then(user => res.json(user))
     .catch(err=> res.json(err))
   });
