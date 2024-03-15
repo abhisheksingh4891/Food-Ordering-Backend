@@ -54,6 +54,29 @@ mongoose.connect(MONGODB_URL)
     .catch(err=> res.json(err))
   });
   
+  app.post('/loginmerchant', (req, res)=>{
+    const {email, password} =  req.body;
+    UserModel.findOne({email:email})
+    .then(user => {
+      if(user){
+        if(user.password === password){
+          res.json("Login Succesfull...")
+        }
+        else{
+          res.json("Password is incorrect...")
+        }
+      }
+      else{
+        res.json("User not found...")
+      }
+    })
+  })
+
+  app.post('/registermerchant', cors(), (req, res)=>{
+    UserModel.create(req.body)
+    .then(user => res.json(user))
+    .catch(err=> res.json(err))
+  });
 
 const PORT = 5000; 
 app.listen(PORT, () => {

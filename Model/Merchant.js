@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema({
+const MerchantSchema = new mongoose.Schema({
     first: {
         type: String,
         required: true
@@ -24,12 +24,8 @@ const UserSchema = new mongoose.Schema({
     confirmPassword: {
         type: String,
         required: true
-    },
-    orders: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Order'
-    }]
+    }
 });
 
-const userModel = mongoose.model('user', UserSchema);
-module.exports = userModel;
+const merchantModel = mongoose.model('merchant', MerchantSchema);
+module.exports = merchantModel;
