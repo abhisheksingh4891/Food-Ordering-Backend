@@ -45,6 +45,7 @@ mongoose.connect(MONGODB_URL)
                             first: user.first,
                             last: user.last,
                             email: user.email,
+                            phone: user.phone,
                             // Add other user data fields as needed
                         }
                     });
@@ -82,6 +83,7 @@ mongoose.connect(MONGODB_URL)
                             first: user.first,
                             last: user.last,
                             email: user.email,
+                            phone: user.phone,
                             // Add other user data fields as needed
                         }
                     });
