@@ -31,23 +31,36 @@ mongoose.connect(MONGODB_URL)
   });
 
   
-  app.post('/login', (req, res)=>{
-    const {email, password} =  req.body;
-    UserModel.findOne({email:email})
-    .then(user => {
-      if(user){
-        if(user.password === password){
-          res.json("Login Succesfull...")
-        }
-        else{
-          res.json("Password is incorrect...")
-        }
-      }
-      else{
-        res.json("User not found...")
-      }
-    })
-  })
+  app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    UserModel.findOne({ email: email })
+        .then(user => {
+            if (user) {
+                if (user.password === password) {
+                    // Return user data along with success message
+                    res.json({
+                        message: "Login Successful...",
+                        user: {
+                            _id: user._id,
+                            first: user.first,
+                            last: user.last,
+                            email: user.email,
+                            // Add other user data fields as needed
+                        }
+                    });
+                } else {
+                    res.status(401).json({ error: "Password is incorrect..." }); // Unauthorized
+                }
+            } else {
+                res.status(404).json({ error: "User not found..." }); // Not Found
+            }
+        })
+        .catch(err => {
+            console.error("Error occurred during login:", err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
 
   app.post('/register', cors(), (req, res)=>{
     UserModel.create(req.body)
