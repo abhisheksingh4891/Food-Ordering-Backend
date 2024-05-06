@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const FoodItemModel = require('./Model/Food_Items');
 const UserModel = require('./Model/User');
-const MerchantModel = require('./Model/Merchant')
+const MerchantModel = require('./Model/Merchant');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(cors());
@@ -22,7 +23,18 @@ mongoose.connect(MONGODB_URL)
   app.get('/data', async (req, res) => {
     try {
       const allData = await FoodItemModel.find({});
-      console.log(allData);
+      // console.log(allData);
+      res.json(allData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
+  app.post('/data', async (req, res) => {
+    try {
+      const allData = await FoodItemModel.find({});
+      // console.log(allData);
       res.json(allData);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -37,17 +49,9 @@ mongoose.connect(MONGODB_URL)
         .then(user => {
             if (user) {
                 if (user.password === password) {
-                    // Return user data along with success message
                     res.json({
                         message: "Login Successful...",
-                        user: {
-                            _id: user._id,
-                            first: user.first,
-                            last: user.last,
-                            email: user.email,
-                            phone: user.phone,
-                            // Add other user data fields as needed
-                        }
+                        userId: user._id
                     });
                 } else {
                     res.status(401).json({ error: "Password is incorrect..." }); // Unauthorized
@@ -62,6 +66,23 @@ mongoose.connect(MONGODB_URL)
         });
 });
 
+app.get('/user/profile', (req, res) => {
+    const userId = req.query.userId;
+    UserModel.findById(userId)
+        .then(user => {
+            if (user) {
+                res.json(user);
+            } else {
+                res.status(404).json({ error: "User not found..." });
+            }
+        })
+        .catch(err => {
+            console.error("Error occurred while fetching user profile:", err);
+            res.status(500).json({ error: 'Internal Server Error' });
+        });
+});
+
+
 
   app.post('/register', cors(), (req, res)=>{
     UserModel.create(req.body)
@@ -72,32 +93,40 @@ mongoose.connect(MONGODB_URL)
   app.post('/loginmerchant', (req, res)=>{
     const { email, password } = req.body;
     MerchantModel.findOne({ email: email })
-        .then(user => {
-            if (user) {
-                if (user.password === password) {
-                    // Return user data along with success message
-                    res.json({
-                        message: "Login Successful...",
-                        user: {
-                            _id: user._id,
-                            first: user.first,
-                            last: user.last,
-                            email: user.email,
-                            phone: user.phone,
-                            // Add other user data fields as needed
-                        }
-                    });
-                } else {
-                    res.status(401).json({ error: "Password is incorrect..." }); // Unauthorized
-                }
-            } else {
-                res.status(404).json({ error: "User not found..." }); // Not Found
-            }
-        })
-        .catch(err => {
-            console.error("Error occurred during login:", err);
-            res.status(500).json({ error: 'Internal Server Error' });
-        });
+    .then(user => {
+      if (user) {
+          if (user.password === password) {
+              res.json({
+                  message: "Login Successful...",
+                  userId: user._id
+              });
+          } else {
+              res.status(401).json({ error: "Password is incorrect..." }); // Unauthorized
+          }
+      } else {
+          res.status(404).json({ error: "User not found..." }); // Not Found
+      }
+  })
+  .catch(err => {
+      console.error("Error occurred during login:", err);
+      res.status(500).json({ error: 'Internal Server Error' });
+  });
+});
+
+app.get('/merchant/profile', (req, res) => {
+const userId = req.query.userId;
+MerchantModel.findById(userId)
+  .then(user => {
+      if (user) {
+          res.json(user);
+      } else {
+          res.status(404).json({ error: "User not found..." });
+      }
+  })
+  .catch(err => {
+      console.error("Error occurred while fetching user profile:", err);
+      res.status(500).json({ error: 'Internal Server Error' });
+  });
 });
 
   app.post('/registermerchant', cors(), (req, res)=>{
